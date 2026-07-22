@@ -1,12 +1,14 @@
 {
-  "name": "my-new-bot",
+  "name": "qaisar-gemspace-bot",
   "version": "1.0.0",
-  "description": "",
+  "description": "Gem Space Games Bot",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
   "dependencies": {
-    "express": "^4.19.2"
+    "better-sqlite3": "^11.8.1",
+    "express": "^4.21.2",
+    "dotenv": "^16.4.7"
   }
 }
