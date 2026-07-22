@@ -91,3 +91,25 @@ console.log(handleGemSpaceMessage('راتب'));
 console.log(handleGemSpaceMessage('كنز'));
 console.log(handleGemSpaceMessage('استثمار 50000'));
 console.log(handleGemSpaceMessage('حظ 10000'));
+// ملف معالجة الرسائل والألعاب
+function handleGemSpaceMessage(messageText) {
+    if (!messageText) return "مرحباً! أرسل كلمة 'العاب' لنبدأ.";
+
+    const text = messageText.trim().toLowerCase();
+
+    if (text.includes('العاب') || text.includes('لعبة')) {
+        return "🎮 أهلاً بك في بوت الألعاب الخاص بقيصر! اختر لعبة:\n1️⃣ لعبة الحظ\n2️⃣ تخمين الرقم\n(اكتب رقم اللعبة للبدء)";
+    } 
+    else if (text === '1' || text.includes('حظ')) {
+        const randomWin = Math.random() > 0.5 ? "🎉 مبروك فزت!" : "hard luck 😢 حاول مرة أخرى!";
+        return `🎲 نتيجة لعبة الحظ: ${randomWin}`;
+    } 
+    else if (text === '2' || text.includes('تخمين')) {
+        return "🔢 تم تفعيل لعبة تخمين الرقم! اختر رقماً بين 1 و 5:";
+    } 
+    else {
+        return `🤖 أهلاً بك! تم استلام رسالتك: "${messageText}"\nحسابي يعمل كبوت ألعاب تلقائياً. اكتب 'العاب' لعرض القائمة.`;
+    }
+}
+
+module.exports = { handleGemSpaceMessage };
