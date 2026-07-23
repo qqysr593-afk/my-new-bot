@@ -1,17 +1,13 @@
 const express = require('express');
-const axios = require('axios');
 const app = express();
 
 app.use(express.json());
 
-// التوكن الخاص ببوتك على تيليجرام
 const TOKEN = '8090547963:AAGYnFz4M-WjFv82x3u67v_Lh_0s7Q8c3Wk';
 const TELEGRAM_API = `https://api.telegram.org/bot${TOKEN}`;
 
-// قاعدة بيانات وهمية للنقاط والأموال
 let userMoney = 5000;
 
-// استقبال الرسائل مباشرة من تيليجرام عبر الـ Webhook
 app.post(`/webhook/${TOKEN}`, async (req, res) => {
     const update = req.body;
     
@@ -58,12 +54,15 @@ app.post(`/webhook/${TOKEN}`, async (req, res) => {
             reply = "أهلاً بك! اكتب 'الالعاب' لعرض قائمة الأوامر المتاحة.";
         }
 
-        // إرسال الرد إلى المستخدم عبر تيليجرام
         try {
-            await axios.post(`${TELEGRAM_API}/sendMessage`, {
-                chat_id: chatId,
-                text: reply,
-                parse_mode: "Markdown"
+            await fetch(`${TELEGRAM_API}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: chatId,
+                    text: reply,
+                    parse_mode: "Markdown"
+                })
             });
         } catch (error) {
             console.error("Error sending message:", error);
@@ -73,7 +72,6 @@ app.post(`/webhook/${TOKEN}`, async (req, res) => {
     res.sendStatus(200);
 });
 
-// فحص السيرفر
 app.get('/', (req, res) => {
     res.send("Bot Server is Running Successfully!");
 });
