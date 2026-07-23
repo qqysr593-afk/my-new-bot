@@ -1,3 +1,4 @@
+
 const express = require('express');
 const { handleMessage } = require('./game');
 const app = express();
@@ -6,8 +7,12 @@ app.use(express.json());
 
 // صفحة الـ Webhook والسيرفر الأساسية (وهنا نستقبل إشعارات الماكرو)
 app.get('/', (req, res) => {
-    // هذا السطر هو الذي سيظهر في سجلات Render عند وصول إشعار
-    console.log("🔔 تم استلام إشعار جديد من هاتفك بنجاح!");
+    const notifTitle = req.query.title || "بدون عنوان";
+    const notifText = req.query.text || "بدون نص";
+    const notifApp = req.query.app || "تطبيق غير معروف";
+
+    // هذا السطر هو الذي سيظهر في سجلات Render مع تفاصيل الإشعار
+    console.log(`🔔 إشعار من [${notifApp}] | العنوان: ${notifTitle} | النص: ${notifText}`);
     
     res.send(`
         <html>
