@@ -3,7 +3,7 @@ const app = express();
 
 app.use(express.json());
 
-const TOKEN = '8090547963:AAGYnFz4M-WjFv82x3u67v_Lh_0s7Q8c3Wk';
+const TOKEN = '8651291872:AAEvZVtnVCWpyczMMSIM-tYWHkX_jZAli3M';
 const TELEGRAM_API = `https://api.telegram.org/bot${TOKEN}`;
 
 let userMoney = 5000;
