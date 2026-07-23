@@ -1,21 +1,56 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>البوت شغال بنجاح</title>
-    <style>
-        body { background: #1a1a1a; color: #fff; font-family: Tahoma, sans-serif; text-align: center; padding-top: 100px; }
-        .box { background: #2b2b2b; max-width: 400px; margin: 0 auto; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-        h1 { color: #f1c40f; }
-        p { color: #2ecc71; font-size: 18px; }
-    </style>
-</head>
-<body>
-    <div class="box">
-        <h1>🤖 بوت Gem Space شغال</h1>
-        <p>السيرفر يعمل 24 ساعة وجاهز لاستقبال الأوامر بنجاح!</p>
-    </div>
-</body>
-</html>
- 
+const express = require('express');
+const { handleMessage } = require('./game');
+const app = express();
+
+app.use(express.json());
+
+// مسار الاستقبال لعرض الصفحة وفي نفس الوقت التقاط إشعارات الماكرو
+app.get('/', (req, res) => {
+    // استخراج بيانات الإشعار المرسلة من MacroDroid
+    const notifTitle = req.query.title || "بدون عنوان";
+    const notifText = req.query.text || "بدون نص";
+    const notifApp = req.query.app || "تطبيق غير معروف";
+
+    // طباعة تفاصيل الإشعار بوضوح في سجلات Render
+    console.log(`🔔 إشعار من [${notifApp}] | العنوان: ${notifTitle} | النص: ${notifText}`);
+
+    res.send(`
+        <!DOCTYPE html>
+        <html lang="ar" dir="rtl">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>البوت شغال بنجاح</title>
+            <style>
+                body { background: #1a1a1a; color: #fff; font-family: Tahoma, sans-serif; text-align: center; padding-top: 100px; }
+                .box { background: #2b2b2b; max-width: 400px; margin: 0 auto; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+                h1 { color: #f1c40f; }
+                p { color: #2ecc71; font-size: 18px; }
+            </style>
+        </head>
+        <body>
+            <div class="box">
+                <h1>🤖 بوت Gem Space شغال</h1>
+                <p>السيرفر يعمل 24 ساعة وجاهز لاستقبال الأوامر بنجاح!</p>
+            </div>
+        </body>
+        </html>
+    `);
+});
+
+app.post('/webhook', (req, res) => {
+    const message = req.body.message || req.body.text || "";
+    const sender = req.body.senderId || "user";
+    
+    const reply = handleMessage(message, sender);
+    if (reply) {
+        return res.json({ reply: reply });
+    }
+    
+    res.status(200).send('OK');
+});
+
+const PORT = process.env.PORT || 10000;
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
