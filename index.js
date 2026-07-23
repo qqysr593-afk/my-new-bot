@@ -115,8 +115,9 @@ async function handleMessage(message) {
     else if (cmd === "حروف") {
         const letterGames = [
             "🔠 كلمة تبدأ بحرف (التاء) وتنتهي بحرف (التاء)؟ (مثل: توت)",
-            "🔠 كلمة تبدأ بحرف (الميم) وتنتهي بحرف (ميم)؟ (مثل: مريم)",
-            "🔠 كلمة تبدأ بحرف (السين) وتنتهي بحرف (نون)؟ (مثل: سجين)"
+            "🔠 كلمة تبدأ بحرف (السين) وتنتهي بحرف (السين)؟ (مثل: سدس)",
+            "🔠 كلمة تبدأ بحرف (الميم) وتنتهي بحرف (الميم)؟ (مثل: مريم)",
+            "🔠 كلمة تبدأ بحرف (الباء) وتنتهي بحرف (الباء)؟ (مثل: باب)"
         ];
         reply = letterGames[Math.floor(Math.random() * letterGames.length)];
     }
@@ -156,7 +157,7 @@ async function handleMessage(message) {
         if (!query) {
             reply = "🎵 يرجى كتابة اسم الأغنية بعد الأمر، مثل:\n`يوت مريت`";
         } else {
-            reply = `🎵 *تم تجهيز الأغنية بصيغة MP3 بنجاح*\n\n🎧 اسم الطلب: (${query})\n\n📥 اضغط على الرابط أدناه للاستماع أو التحميل المباشر:\nhttps://www.youtube.com/results?search_query=${encodeURIComponent(query)}+audio+mp3`;
+            reply = `🎵 *جاري جلب الأغنية المطلوبة بصيغة MP3*\n\n🎧 الأغنية: (${query})\n\n🔗 اضغط على الرابط أدناه للتحميل والاستماع المباشر للصوت:\nhttps://www.youtube.com/results?search_query=${encodeURIComponent(query)}+audio+mp3`;
         }
     }
     else if (cmd === "بوت") {
@@ -266,10 +267,9 @@ async function handleMessage(message) {
     }
 }
 
-// تشغيل نظام سحب الرسائل تلقائياً (Long Polling)
+// نظام Polling التلقائي لسحب الرسائل
 let offset = 0;
 async function startPolling() {
-    // حذف أي الوب هوك قديم أولاً لكي لا يحدث تعارض
     try {
         await fetch(`${TELEGRAM_API}/deleteWebhook?drop_pending_updates=true`);
         console.log("Old Webhook deleted successfully.");
@@ -294,12 +294,11 @@ async function startPolling() {
             }
         } catch (error) {
             console.error("Polling error:", error);
-            await new Promise(resolve => setTimeout(resolve, 3000)); // الانتظار قليلاً عند حدوث خطأ
+            await new Promise(resolve => setTimeout(resolve, 3000));
         }
     }
 }
 
-// خادم Express بسيط لإبقاء السيرفر نشطاً على Render
 app.get('/', (req, res) => {
     res.send("Bot Polling Server is Running Successfully!");
 });
@@ -307,5 +306,5 @@ app.get('/', (req, res) => {
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
-    startPolling(); // بدء البوت فور تشغيل السيرفر
+    startPolling();
 });
