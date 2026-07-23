@@ -13,11 +13,14 @@ app.post(`/webhook/${TOKEN}`, async (req, res) => {
     
     if (update.message && update.message.text) {
         const chatId = update.message.chat.id;
-        const text = update.message.text.trim();
+        const fullText = update.message.text.trim();
+        const args = fullText.split(' ');
+        const cmd = args[0];
+        const query = args.slice(1).join(' ');
         let reply = "";
 
-        if (text === "الالعاب" || text === "اوامر" || text === "/start") {
-            reply = "🎮 *قائمة الألعاب والأوامر*\n" +
+        if (cmd === "الالعاب" || cmd === "اوامر" || cmd === "/start") {
+            reply = "🎮 *قائمة الألعاب والأوامر المتاحة*\n" +
                     "--------------------\n" +
                     "▫️ سمايلات • اسئلة • عواصم\n" +
                     "▫️ رياضيات • انخليزي • عربي\n" +
@@ -33,7 +36,7 @@ app.post(`/webhook/${TOKEN}`, async (req, res) => {
                     "💰 *البنـك*\n" +
                     "▫️ فلوسي • راتب";
         } 
-        else if (text === "اسئلة") {
+        else if (cmd === "اسئلة") {
             const questions = [
                 "س\nكيف الجو عندك اليوم ؟",
                 "س\nشخص اذا جان بلطلعة تتونس بوجود؟",
@@ -42,16 +45,48 @@ app.post(`/webhook/${TOKEN}`, async (req, res) => {
                 "س\nتعطي فرصة ثانية للشخص الي كسرك ؟"
             ];
             reply = questions[Math.floor(Math.random() * questions.length)];
-        } 
-        else if (text === "فلوسي") {
+        }
+        else if (cmd === "سمايلات") {
+            const smiles = ["😀", "😎", "🔥", "❤️", "🌹", "👑", "⚡", "💎"];
+            reply = "🎲 لغز السمايلات:\nما هو شعور هذا السمايل؟ " + smiles[Math.floor(Math.random() * smiles.length)];
+        }
+        else if (cmd === "عواصم") {
+            const capitals = [
+                "ما هي عاصمة العراق؟ 🇮🇶",
+                "ما هي عاصمة مصر؟ 🇪🇬",
+                "ما هي عاصمة السعودية؟ 🇸🇦",
+                "ما هي عاصمة الإمارات؟ 🇦🇪"
+            ];
+            reply = capitals[Math.floor(Math.random() * capitals.length)];
+        }
+        else if (cmd === "رياضيات") {
+            const n1 = Math.floor(Math.random() * 10) + 1;
+            const n2 = Math.floor(Math.random() * 10) + 1;
+            reply = `🧮 حل المسألة الرياضية:\nكم الناتج؟ ${n1} + ${n2} = ?`;
+        }
+        else if (cmd === "يوت") {
+            if (!query) {
+                reply = "🎵 يرجى كتابة اسم الأغنية بعد الأمر، مثل:\n`يوت مريت`";
+            } else {
+                reply = `🎵 جاري البحث عن أغنية: (${query})\n🔗 رابط البحث المقترح:\nhttps://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
+            }
+        }
+        else if (cmd === "بوت") {
+            if (!query) {
+                reply = "🤖 تفضل، اسألني بشيء بعد كلمة بوت، مثل:\n`بوت من هو العباس؟`";
+            } else {
+                reply = `🤖 أهلاً بك! لقد سألت: (${query})\n💡 جارٍ معالجة سؤالك... السيرفر يعمل بتمكن تام!`;
+            }
+        }
+        else if (cmd === "فلوسي") {
             reply = `💰 رصيدك الحالي: ${userMoney} نقطة`;
         }
-        else if (text === "راتب") {
+        else if (cmd === "راتب") {
             userMoney += 1000;
-            reply = `🎁 تم إضافة الراتب بنجاح! رصيدك أصبح: ${userMoney}`;
+            reply = `🎁 تم إضافة الراتب بنجاح! رصيدك أصبح: ${userMoney} نقطة`;
         }
         else {
-            reply = "أهلاً بك! اكتب 'الالعاب' لعرض قائمة الأوامر المتاحة.";
+            reply = "❌ الأمر غير موجود. اكتب 'الالعاب' لعرض قائمة الأوامر المتاحة.";
         }
 
         try {
