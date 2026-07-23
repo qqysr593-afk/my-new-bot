@@ -1,14 +1,12 @@
 {
-  "name": "qaisar-gemspace-bot",
+  "name": "my-new-bot",
   "version": "1.0.0",
-  "description": "Gem Space Games Bot",
+  "description": "Telegram Bot Server",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
   "dependencies": {
-    "better-sqlite3": "^11.8.1",
-    "express": "^4.21.2",
-    "dotenv": "^16.4.7"
+    "express": "^4.19.2"
   }
 }
