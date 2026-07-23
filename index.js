@@ -1,4 +1,3 @@
-
 const express = require('express');
 const { handleMessage } = require('./game');
 const app = express();
