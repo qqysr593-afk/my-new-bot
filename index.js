@@ -4,8 +4,11 @@ const app = express();
 
 app.use(express.json());
 
-// صفحة الـ Webhook والسيرفر الأساسية
+// صفحة الـ Webhook والسيرفر الأساسية (وهنا نستقبل إشعارات الماكرو)
 app.get('/', (req, res) => {
+    // هذا السطر هو الذي سيظهر في سجلات Render عند وصول إشعار
+    console.log("🔔 تم استلام إشعار جديد من هاتفك بنجاح!");
+    
     res.send(`
         <html>
             <body style="background:#1a1a2e; color:#ffd700; text-align:center; padding-top:50px; font-family:sans-serif;">
@@ -28,7 +31,7 @@ app.post('/webhook', (req, res) => {
     res.status(200).send('OK');
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
