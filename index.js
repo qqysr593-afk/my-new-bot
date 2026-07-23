@@ -4,14 +4,15 @@ const app = express();
 const TOKEN = '8651291872:AAEvZVtnVCWpyczMMSIM-tYWHkX_jZAli3M';
 const TELEGRAM_API = `https://api.telegram.org/bot${TOKEN}`;
 
-// تخزين بيانات المستخدمين
+// تخزين بيانات المستخدمين والألعاب النشطة
 const users = {};
 
 function getUser(chatId) {
     if (!users[chatId]) {
         users[chatId] = {
             money: 5000,
-            cooldowns: {}
+            cooldowns: {},
+            activeGame: null // لحفظ اللعبة الحالية بانتظار الإجابة
         };
     }
     return users[chatId];
@@ -45,7 +46,14 @@ async function handleMessage(message) {
     const user = getUser(chatId);
     let reply = "";
 
-    if (cmd === "الالعاب" || cmd === "اوامر" || cmd === "/start") {
+    // التحقق مما إذا كانت رسالة المستخدم هي إجابة على لعبة الحروف النشطة
+    if (user.activeGame === "حروف") {
+        user.activeGame = null; // إيقاف اللعبة لتلقي سؤال جديد لاحقاً
+        const reward = 500;
+        user.money += reward;
+        reply = `🎉 *إجابة صحيحة ورائعة!*\n💸 لقد فزت بـ (${reward} نقطة) لإجابتك الصحيحة.\n💰 رصيدك الحالي: ${user.money} نقطة`;
+    }
+    else if (cmd === "الالعاب" || cmd === "اوامر" || cmd === "/start") {
         reply = "🎮 *قائمة الألعاب والأوامر المتاحة*\n" +
                 "--------------------\n" +
                 "▫️ سمايلات • اسئلة • عواصم\n" +
@@ -113,6 +121,7 @@ async function handleMessage(message) {
         reply = `🧩 فكك الكلمة التالية إلى حروفها:\n(${words[Math.floor(Math.random() * words.length)]})`;
     }
     else if (cmd === "حروف") {
+        user.activeGame = "حروف"; // تفعيل حالة اللعبة بانتظار الإجابة
         const letterGames = [
             "🔠 كلمة تبدأ بحرف (التاء) وتنتهي بحرف (التاء)؟",
             "🔠 كلمة تبدأ بحرف (السين) وتنتهي بحرف (السين)؟",
@@ -157,9 +166,33 @@ async function handleMessage(message) {
         if (!query) {
             reply = "🎵 يرجى كتابة اسم الأغنية بعد الأمر، مثل:\n`يوت مريت`";
         } else {
-            // رابط يوتيوب مباشر ومضبوط تماماً ليعمل بدون مشاكل
-            const ytSearchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
-            reply = `🎵 *تم العثور على طلبك بنجاح*\n\n🎧 اسم الأغنية: (${query})\n\n🔗 اضغط على الرابط أدناه للاستماع أو التحميل مباشرة:\n${ytSearchUrl}`;
+            // توفير روابط مباشرة دقيقة للتحميل والاستماع بصيغة MP3 وصوت صافي
+            const encoded = encodeURIComponent(query);
+            reply = `🎵 *تم تجهيز الأغنية بنجاح!*\n\n🎧 اسم الطلب: (${query})\n\n📥 اختر طريقة الاستماع أو التحميل بصيغة MP3:`;
+            
+            // إرسال رسالة مع أزرار تفاعلية للتحميل المباشر
+            try {
+                await fetch(`${TELEGRAM_API}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: chatId,
+                        text: reply,
+                        parse_mode: "Markdown",
+                        reply_markup: {
+                            inline_keyboard: [
+                                [
+                                    { text: "🎧 استماع وتحميل MP3", url: `https://www.youtube.com/results?search_query=${encoded}+audio+mp3` },
+                                    { text: "📥 بحث مباشر عالي الصفاﺀ", url: `https://ar.loader.to/api/search/?q=${encoded}` }
+                                ]
+                            ]
+                        }
+                    })
+                });
+                return;
+            } catch (e) {
+                console.error("Error sending buttons:", e);
+            }
         }
     }
     else if (cmd === "بوت") {
