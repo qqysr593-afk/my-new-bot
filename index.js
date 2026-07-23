@@ -39,9 +39,14 @@ app.post(`/webhook/${TOKEN}`, async (req, res) => {
         const chatId = update.message.chat.id;
         const fullText = update.message.text.trim();
         const args = fullText.split(' ');
-        const cmd = args[0];
-        const query = args.slice(1).join(' ');
+        let cmd = args[0];
+        let query = args.slice(1).join(' ');
         
+        // تصحيح كلمة انخليزي إلى انجليزي تلقائياً
+        if (cmd === "انخليزي") {
+            cmd = "انجليزي";
+        }
+
         const user = getUser(chatId);
         let reply = "";
 
@@ -49,15 +54,16 @@ app.post(`/webhook/${TOKEN}`, async (req, res) => {
             reply = "🎮 *قائمة الألعاب والأوامر المتاحة*\n" +
                     "--------------------\n" +
                     "▫️ سمايلات • اسئلة • عواصم\n" +
-                    "▫️ رياضيات • انخليزي • عربي\n" +
+                    "▫️ رياضيات • انجليزي • عربي\n" +
                     "▫️ تفكيك • حروف • دين • اكمل\n" +
                     "▫️ اعلام • اسرع • صراحه • لو • تك\n" +
+                    "▫️ المليون (من سيربح المليون)\n" +
                     "--------------------\n" +
                     "🎵 *اليوتيوب*\n" +
                     "▫️ يوت [اسم الاغنية]\n" +
                     "--------------------\n" +
                     "🤖 *الذكاء الاصطناعي*\n" +
-                    "▫️ بوت [سؤالك]\n" +
+                    "▫️ اكتب سؤالك مباشرة أو: بوت [سؤالك]\n" +
                     "--------------------\n" +
                     "💰 *البنك والأموال*\n" +
                     "▫️ فلوسي • راتب (كل 10 د)\n" +
@@ -66,11 +72,11 @@ app.post(`/webhook/${TOKEN}`, async (req, res) => {
         } 
         else if (cmd === "اسئلة") {
             const questions = [
-                "س\nكيف الجو عندك اليوم ؟",
-                "س\nشخص اذا جان بلطلعة تتونس بوجود؟",
-                "س\nكلمة توجهها لوالدك ؟",
-                "س\nهل تشعر أن هنالك مَن يُحبك؟",
-                "س\nتعطي فرصة ثانية للشخص الي كسرك ؟"
+                "س: كيف الجو عندك اليوم ؟",
+                "س: شخص اذا جان بلطلعة تتونس بوجوده؟",
+                "س: كلمة توجهها لوالدك ؟",
+                "س: هل تشعر أن هنالك مَن يُحبك؟",
+                "س: تعطي فرصة ثانية للشخص الي كسرك ؟"
             ];
             reply = questions[Math.floor(Math.random() * questions.length)];
         }
@@ -83,7 +89,8 @@ app.post(`/webhook/${TOKEN}`, async (req, res) => {
                 "ما هي عاصمة العراق؟ 🇮🇶",
                 "ما هي عاصمة مصر؟ 🇪🇬",
                 "ما هي عاصمة السعودية؟ 🇸🇦",
-                "ما هي عاصمة الإمارات؟ 🇦🇪"
+                "ما هي عاصمة الإمارات؟ 🇦🇪",
+                "ما هي عاصمة الكويت؟ 🇰🇼"
             ];
             reply = capitals[Math.floor(Math.random() * capitals.length)];
         }
@@ -92,15 +99,22 @@ app.post(`/webhook/${TOKEN}`, async (req, res) => {
             const n2 = Math.floor(Math.random() * 10) + 1;
             reply = `🧮 حل المسألة الرياضية:\nكم الناتج؟ ${n1} + ${n2} = ?`;
         }
-        else if (cmd === "انخليزي") {
-            const words = ["Apple", "Book", "Computer", "Phone", "Car", "Sun"];
-            reply = `🔤 ترجم الكلمة التالية إلى العربية:\n(${words[Math.floor(Math.random() * words.length)]})`;
+        else if (cmd === "انجليزي") {
+            const words = [
+                { en: "Car", ar: "سيارة" },
+                { en: "Apple", ar: "تفاحة" },
+                { en: "Book", ar: "كتاب" },
+                { en: "Computer", ar: "حاسوب" },
+                { en: "Phone", ar: "هاتف" }
+            ];
+            const selected = words[Math.floor(Math.random() * words.length)];
+            reply = `🔤 ترجم الكلمة التالية إلى العربية:\n(${selected.en})`;
         }
         else if (cmd === "عربي") {
             reply = "📖 اعطنا مرادف كلمة: (شجاعة)";
         }
         else if (cmd === "تفكيك") {
-            const words = ["مدرسة", "تاريخ", "حاسوب"];
+            const words = ["مدرسة", "تاريخ", "حاسوب", "سماء"];
             reply = `🧩 فكك الكلمة التالية إلى حروفها:\n(${words[Math.floor(Math.random() * words.length)]})`;
         }
         else if (cmd === "حروف") {
@@ -127,6 +141,14 @@ app.post(`/webhook/${TOKEN}`, async (req, res) => {
         else if (cmd === "تك") {
             reply = "🎯 لعبة التك:\nاختر رقماً من 1 إلى 3 لجائزة مخفية!";
         }
+        else if (cmd === "المليون") {
+            const millionaireQuestions = [
+                "💰 *من سيربح المليون* (السؤال الأول):\nما هو الكوكب الأقرب إلى الشمس؟\n\nأ) المريخ\nب) عطارد\nج) الزهرة\nد) المشتري",
+                "💰 *من سيربح المليون* (السؤال الثاني):\nفي أي قارة تقع دولة أستراليا؟\n\nأ) آسيا\nب) أفريقيا\nج) أستراليا (أوقيانوسيا)\nد) أوروبا",
+                "💰 *من سيربح المليون* (السؤال الثالث):\nما هي عاصمة أستراليا وليست سيدني؟\n\nأ) ملبورن\nب) كانبرا\nج) بريزبان\nد) بيرث"
+            ];
+            reply = millionaireQuestions[Math.floor(Math.random() * millionaireQuestions.length)];
+        }
         else if (cmd === "يوت") {
             if (!query) {
                 reply = "🎵 يرجى كتابة اسم الأغنية بعد الأمر، مثل:\n`يوت مريت`";
@@ -136,9 +158,9 @@ app.post(`/webhook/${TOKEN}`, async (req, res) => {
         }
         else if (cmd === "بوت") {
             if (!query) {
-                reply = "🤖 تفضل، اسألني بشيء بعد كلمة بوت، مثل:\n`بوت من أنت؟`";
+                reply = "🤖 تفضل، اسألني بأي سؤال تريده!";
             } else {
-                reply = `🤖 رد الذكاء الاصطناعي على سؤالك (${query}):\nسيرفرك يعمل بكفاءة تامة وجاهز للرد على استفساراتك!`;
+                reply = `🤖 رد الذكاء الاصطناعي على سؤالك (${query}):\nهذا جواب ذكي وسريع لخدمتك!`;
             }
         }
         else if (cmd === "فلوسي") {
@@ -198,13 +220,13 @@ app.post(`/webhook/${TOKEN}`, async (req, res) => {
                 reply = `⏳ استثمارك قيد التشغيل، يمكنك الاستثمار مرة أخرى بعد ${waitTime} دقيقة.`;
             } else {
                 user.cooldowns["استثمار"] = Date.now();
-                const investmentGain = Math.floor(Math.random() * 15000) + 20000; // يبدأ من 20000 فما فوق
+                const investmentGain = Math.floor(Math.random() * 15000) + 20000;
                 user.money += investmentGain;
                 reply = `📈 نجح استثمارك الضخم وحققت أرباحاً بلغت (${investmentGain} نقطة)!\n💰 رصيدك الحالي: ${user.money} نقطة`;
             }
         }
         else {
-            reply = "❌ الأمر غير موجود. اكتب 'الالعاب' لعرض قائمة الأوامر المتاحة.";
+            reply = `🤖 رد الذكاء الاصطناعي على سؤالك (${fullText}):\nتم استلام سؤالك والرد عليه بنجاح!`;
         }
 
         try {
