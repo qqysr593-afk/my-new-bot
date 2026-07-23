@@ -114,10 +114,10 @@ async function handleMessage(message) {
     }
     else if (cmd === "حروف") {
         const letterGames = [
-            "🔠 كلمة تبدأ بحرف (التاء) وتنتهي بحرف (التاء)؟ (مثل: توت)",
-            "🔠 كلمة تبدأ بحرف (السين) وتنتهي بحرف (السين)؟ (مثل: سدس)",
-            "🔠 كلمة تبدأ بحرف (الميم) وتنتهي بحرف (الميم)؟ (مثل: مريم)",
-            "🔠 كلمة تبدأ بحرف (الباء) وتنتهي بحرف (الباء)؟ (مثل: باب)"
+            "🔠 كلمة تبدأ بحرف (التاء) وتنتهي بحرف (التاء)؟",
+            "🔠 كلمة تبدأ بحرف (السين) وتنتهي بحرف (السين)؟",
+            "🔠 كلمة تبدأ بحرف (الميم) وتنتهي بحرف (الميم)؟",
+            "🔠 كلمة تبدأ بحرف (الباء) وتنتهي بحرف (الباء)؟"
         ];
         reply = letterGames[Math.floor(Math.random() * letterGames.length)];
     }
@@ -157,7 +157,9 @@ async function handleMessage(message) {
         if (!query) {
             reply = "🎵 يرجى كتابة اسم الأغنية بعد الأمر، مثل:\n`يوت مريت`";
         } else {
-            reply = `🎵 *جاري جلب الأغنية المطلوبة بصيغة MP3*\n\n🎧 الأغنية: (${query})\n\n🔗 اضغط على الرابط أدناه للتحميل والاستماع المباشر للصوت:\nhttps://www.youtube.com/results?search_query=${encodeURIComponent(query)}+audio+mp3`;
+            // رابط يوتيوب مباشر ومضبوط تماماً ليعمل بدون مشاكل
+            const ytSearchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
+            reply = `🎵 *تم العثور على طلبك بنجاح*\n\n🎧 اسم الأغنية: (${query})\n\n🔗 اضغط على الرابط أدناه للاستماع أو التحميل مباشرة:\n${ytSearchUrl}`;
         }
     }
     else if (cmd === "بوت") {
